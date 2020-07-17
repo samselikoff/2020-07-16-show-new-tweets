@@ -8,8 +8,10 @@
     "start": "next start"
   },
   "dependencies": {
+    "miragejs": "^0.1.40",
     "next": "9.4.4",
     "react": "16.13.1",
-    "react-dom": "16.13.1"
+    "react-dom": "16.13.1",
+    "swr": "^0.2.3"
   }
 }
