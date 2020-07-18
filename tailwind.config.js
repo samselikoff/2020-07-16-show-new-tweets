@@ -17,6 +17,11 @@ module.exports = {
       "5xl": px(48),
       "6xl": px(64),
     },
+    extend: {
+      screens: {
+        xs: "480px",
+      },
+    },
   },
   variants: {},
   plugins: [require("@tailwindcss/ui")],

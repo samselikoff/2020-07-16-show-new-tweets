@@ -3,14 +3,14 @@ import { Link } from "../components/Link";
 
 function MyApp({ Component, pageProps }) {
   return (
-    <div className="absolute flex justify-center w-screen h-screen mx-auto text-base text-gray-900 bg-gray-900">
+    <div className="flex flex-col items-center justify-center w-screen h-screen mx-auto text-base text-gray-900 bg-cool-gray-200 xs:py-8">
       <div
-        className="fixed flex flex-col w-full max-w-sm mt-8 overflow-hidden bg-white shadow-md"
-        style={{ height: 812 }}
+        className="relative flex flex-col flex-1 w-full overflow-hidden bg-white shadow xs:max-w-sm"
+        style={{ maxHeight: 812 }}
       >
         <header
-          className={`absolute inset-x-0 top-0 flex items-center px-4 bg-white h-13 ${
-            Component.headerBorder ? "border-b border-gray-300" : ""
+          className={`flex items-center px-4 bg-white h-13 border-b ${
+            Component.headerBorder ? "border-gray-300" : "border-transparent"
           }`}
         >
           <img
@@ -23,11 +23,11 @@ function MyApp({ Component, pageProps }) {
           </p>
         </header>
 
-        <main className="flex-1 overflow-scroll mt-13 mb-14">
+        <main className="flex-1 overflow-scroll">
           <Component {...pageProps} />
         </main>
 
-        <footer className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-white border-t border-gray-200">
+        <footer className="flex items-center justify-between bg-white border-t border-gray-200">
           <FooterLink
             href="/"
             activeIcon={<HomeIcon className="w-7 h-7" />}
