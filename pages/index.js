@@ -38,10 +38,10 @@ let server = createServer({
 
 setInterval(() => {
   server.create("tweet");
-}, 4000);
+}, 2000);
 
 function Home() {
-  const { data, error, stale, update } = useBufferedData("/api/tweets");
+  const { data, error } = useSWR("/api/tweets", fetcher);
 
   if (error) return "An error has occurred.";
   if (!data)
@@ -53,28 +53,6 @@ function Home() {
 
   return (
     <div>
-      {stale && (
-        <div className="absolute inset-x-0 flex justify-center top-20">
-          <button
-            onClick={update}
-            className="flex items-center px-4 py-1 text-white bg-blue-500 rounded-full shadow-lg"
-          >
-            <svg
-              className="w-4 h-4 mr-2"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path
-                fill-rule="evenodd"
-                d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z"
-                clip-rule="evenodd"
-              ></path>
-            </svg>
-            See new Tweets
-          </button>
-        </div>
-      )}
-
       <div className="divide-y divide-gray-200">
         {[...data.tweets].reverse().map((tweet) => (
           <div className="px-4 py-2" key={tweet.id}>
@@ -134,34 +112,6 @@ function Tweet({ tweet }) {
     </div>
   );
 }
-
-// export default function Home() {
-//   const { data, error, stale, update } = useBufferedData("/api/tweets");
-
-//   if (error) return "An error has occurred.";
-//   if (!data) return "Loading...";
-
-//   return (
-//     <>
-//       <p>
-//         New data:{" "}
-//         {stale ? (
-//           <>
-//             Yes
-//             <button onClick={update}>Update</button>
-//           </>
-//         ) : (
-//           "No"
-//         )}
-//       </p>
-//       <ul>
-//         {[...data.tweets].reverse().map((tweet) => (
-//           <li key={tweet.id}>{tweet.id}</li>
-//         ))}
-//       </ul>
-//     </>
-//   );
-// }
 
 // Hooks
 
