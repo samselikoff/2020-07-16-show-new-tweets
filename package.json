@@ -8,10 +8,13 @@
     "start": "next start"
   },
   "dependencies": {
+    "@tailwindcss/ui": "^0.3.1",
     "miragejs": "^0.1.40",
     "next": "9.4.4",
+    "postcss-preset-env": "^6.7.0",
     "react": "16.13.1",
     "react-dom": "16.13.1",
-    "swr": "^0.2.3"
+    "swr": "^0.2.3",
+    "tailwindcss": "^1.5.1"
   }
 }
