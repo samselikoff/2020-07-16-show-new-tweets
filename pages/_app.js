@@ -3,51 +3,56 @@ import { Link } from "../components/Link";
 
 function MyApp({ Component, pageProps }) {
   return (
-    <div className="text-base text-gray-900">
-      <header
-        className={`fixed inset-x-0 top-0 flex items-center px-4 bg-white h-13 ${
-          Component.headerBorder ? "border-b border-gray-300" : ""
-        }`}
+    <div className="absolute flex justify-center w-screen h-screen mx-auto text-base text-gray-900 bg-gray-900">
+      <div
+        className="fixed flex flex-col w-full max-w-sm mt-8 overflow-hidden bg-white shadow-md"
+        style={{ height: 812 }}
       >
-        <img
-          className="rounded-full w-7 h-7"
-          src="https://pbs.twimg.com/profile_images/1282391598878392320/sFA_RlbT_400x400.jpg"
-          alt=""
-        />
-        <p className="pl-px text-lg font-extrabold ml-7">
-          {Component.headerTitle}
-        </p>
-      </header>
+        <header
+          className={`absolute inset-x-0 top-0 flex items-center px-4 bg-white h-13 ${
+            Component.headerBorder ? "border-b border-gray-300" : ""
+          }`}
+        >
+          <img
+            className="rounded-full w-7 h-7"
+            src="https://pbs.twimg.com/profile_images/1282391598878392320/sFA_RlbT_400x400.jpg"
+            alt=""
+          />
+          <p className="pl-px text-lg font-extrabold ml-7">
+            {Component.headerTitle}
+          </p>
+        </header>
 
-      <main className="mt-13 mb-14">
-        <Component {...pageProps} />
-      </main>
+        <main className="flex-1 overflow-scroll mt-13 mb-14">
+          <Component {...pageProps} />
+        </main>
 
-      <footer className="fixed inset-x-0 bottom-0 flex items-center justify-between bg-white border-t border-gray-200">
-        <FooterLink
-          href="/"
-          activeIcon={<HomeIcon className="w-7 h-7" />}
-          inactiveIcon={<HomeIconEmpty className="w-7 h-7" />}
-        />
+        <footer className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-white border-t border-gray-200">
+          <FooterLink
+            href="/"
+            activeIcon={<HomeIcon className="w-7 h-7" />}
+            inactiveIcon={<HomeIconEmpty className="w-7 h-7" />}
+          />
 
-        <FooterLink
-          href="/explore"
-          activeIcon={<SearchIcon className="w-7 h-7" />}
-          inactiveIcon={<SearchIconEmpty className="w-7 h-7" />}
-        />
+          <FooterLink
+            href="/explore"
+            activeIcon={<SearchIcon className="w-7 h-7" />}
+            inactiveIcon={<SearchIconEmpty className="w-7 h-7" />}
+          />
 
-        <FooterLink
-          href="/notifications"
-          activeIcon={<BellIcon className="w-7 h-7" />}
-          inactiveIcon={<BellIconEmpty className="w-7 h-7" />}
-        />
+          <FooterLink
+            href="/notifications"
+            activeIcon={<BellIcon className="w-7 h-7" />}
+            inactiveIcon={<BellIconEmpty className="w-7 h-7" />}
+          />
 
-        <FooterLink
-          href="/messages"
-          activeIcon={<MailboxIcon className="w-7 h-7" />}
-          inactiveIcon={<MailboxIconEmpty className="w-7 h-7" />}
-        />
-      </footer>
+          <FooterLink
+            href="/messages"
+            activeIcon={<MailboxIcon className="w-7 h-7" />}
+            inactiveIcon={<MailboxIconEmpty className="w-7 h-7" />}
+          />
+        </footer>
+      </div>
     </div>
   );
 }

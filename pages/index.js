@@ -2,35 +2,69 @@ import Head from "next/head";
 import Link from "next/link";
 import { useState } from "react";
 import useSWR from "swr";
-import { createServer, Model } from "miragejs";
+import { createServer, Model, Factory } from "miragejs";
+import { format, add, parseISO } from "date-fns";
 
 const fetcher = (url) => fetch(url).then((res) => res.json());
+let startingDate = parseISO("2020-01-01");
+let server = createServer({
+  models: {
+    tweet: Model,
+  },
 
-// let server = createServer({
-//   models: {
-//     tweet: Model,
-//   },
-//   routes() {
-//     this.namespace = "api";
-//     this.get("tweets");
-//   },
-//   seeds(server) {
-//     server.createList("tweet", 5);
-//   },
-// });
+  factories: {
+    tweet: Factory.extend({
+      name: "Sam Selikoff",
+      username: "samselikoff",
+      text: "I still don't understand useEffect",
+      avatarUrl:
+        "https://pbs.twimg.com/profile_images/1282391598878392320/sFA_RlbT_400x400.jpg",
+      date(i) {
+        return add(startingDate, { days: i }).toISOString();
+      },
+    }),
+  },
 
-// setInterval(() => {
-//   server.create("tweet");
-// }, 3000);
+  routes() {
+    this.namespace = "api";
+    this.get("tweets");
+  },
+
+  seeds(server) {
+    server.createList("tweet", 15);
+  },
+});
+
+setInterval(() => {
+  server.create("tweet");
+}, 4000);
 
 function Home() {
+  const { data, error, stale, update } = useBufferedData("/api/tweets");
+
+  if (error) return "An error has occurred.";
+  if (!data) return "Loading...";
+
   return (
-    <div className="divide-y divide-gray-200">
-      {[...Array(20)].map((el, index) => (
-        <div className="px-4 py-2" key={index}>
-          <Tweet />
+    <div>
+      {stale && (
+        <div className="fixed inset-x-0 flex justify-center top-20">
+          <button
+            onClick={update}
+            className="px-4 py-2 font-bold text-white bg-blue-500 rounded-full shadow-md"
+          >
+            Load newest tweets
+          </button>
         </div>
-      ))}
+      )}
+
+      <div className="divide-y divide-gray-200">
+        {[...data.tweets].reverse().map((tweet) => (
+          <div className="px-4 py-2" key={tweet.id}>
+            <Tweet tweet={tweet} />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -40,23 +74,21 @@ Home.headerBorder = true;
 
 export default Home;
 
-function Tweet() {
+function Tweet({ tweet }) {
   return (
     <div className="flex">
-      <img
-        className="w-12 h-12 mr-3 rounded-full"
-        src="https://pbs.twimg.com/profile_images/1282391598878392320/sFA_RlbT_400x400.jpg"
-        alt=""
-      />
+      <img className="w-12 h-12 mr-3 rounded-full" src={tweet.avatarUrl} />
 
       <div className="flex-1">
         <p className="flex items-center space-x-2 font-bold">
-          <span>Sam Selikoff</span>
-          <span className="font-normal text-gray-500">@samselikoff</span>
+          <span>{tweet.name}</span>
+          <span className="font-normal text-gray-500">@{tweet.username}</span>
           <span className="text-xs text-gray-500">·</span>
-          <span className="font-normal text-gray-500">21m</span>
+          <span className="font-normal text-gray-500">
+            {format(parseISO(tweet.date), "MMM d")}
+          </span>
         </p>
-        <p>I still don't understand useEffect!</p>
+        <p className="text-sm">{tweet.text}</p>
 
         <div className="flex justify-between mt-3 text-gray-500">
           <svg viewBox="0 0 24 24" className="w-5 h-5 p-px fill-current">
