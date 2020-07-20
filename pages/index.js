@@ -1,47 +1,28 @@
 import Head from "next/head";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import useSWR from "swr";
-import { createServer, Model, Factory } from "miragejs";
-import { format, add, parseISO } from "date-fns";
+import { format, parseISO } from "date-fns";
 
 const fetcher = (url) => fetch(url).then((res) => res.json());
-let startingDate = parseISO("2020-01-14");
-let server = createServer({
-  timing: 1000,
-  models: {
-    tweet: Model,
-  },
-
-  factories: {
-    tweet: Factory.extend({
-      name: "Sam Selikoff",
-      username: "samselikoff",
-      text: "I still don't understand useEffect",
-      avatarUrl:
-        "https://pbs.twimg.com/profile_images/1282391598878392320/sFA_RlbT_400x400.jpg",
-      date(i) {
-        return add(startingDate, { days: i }).toISOString();
-      },
-    }),
-  },
-
-  routes() {
-    this.namespace = "api";
-    this.get("tweets");
-  },
-
-  seeds(server) {
-    server.createList("tweet", 15);
-  },
-});
-
-setInterval(() => {
-  server.create("tweet");
-}, 2000);
 
 function Home() {
   const { data, error } = useSWR("/api/tweets", fetcher);
+  let [buffer, setBuffer] = useState();
+
+  if (data && !buffer) {
+    setBuffer(data);
+  }
+
+  return <p>lorem ipsum</p>;
+  console.log({ buffer });
+
+  let bufferedData = buffer || data;
+  let stale = data !== buffer;
+
+  function update() {
+    setBuffer(data);
+  }
 
   if (error) return "An error has occurred.";
   if (!data)
@@ -53,8 +34,29 @@ function Home() {
 
   return (
     <div>
+      {stale && (
+        <div className="absolute inset-x-0 flex justify-center top-20">
+          <button
+            onClick={update}
+            className="flex items-center px-4 py-1 text-white bg-blue-500 rounded-full shadow-lg focus:outline-none focus:shadow-outline"
+          >
+            <svg
+              className="w-4 h-4 mr-2"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z"
+                clipRule="evenodd"
+              ></path>
+            </svg>
+            See new Tweets
+          </button>
+        </div>
+      )}
       <div className="divide-y divide-gray-200">
-        {[...data.tweets].reverse().map((tweet) => (
+        {[...bufferedData.tweets].reverse().map((tweet) => (
           <div className="px-4 py-2" key={tweet.id}>
             <Tweet tweet={tweet} />
           </div>
@@ -74,15 +76,20 @@ function Tweet({ tweet }) {
     <div className="flex">
       <img className="w-12 h-12 mr-3 rounded-full" src={tweet.avatarUrl} />
 
-      <div className="flex-1">
-        <p className="flex items-center space-x-2 font-bold">
-          <span>{tweet.name}</span>
-          <span className="font-normal text-gray-500">@{tweet.username}</span>
-          <span className="text-xs text-gray-500">·</span>
-          <span className="font-normal text-gray-500">
+      <div className="flex flex-col min-w-0">
+        <p className="flex items-center max-w-full font-bold">
+          <span className="overflow-hidden whitespace-no-wrap">
+            <span>{tweet.name}</span>
+            <span className="pl-3 font-normal text-gray-500">
+              @{tweet.username}
+            </span>
+          </span>
+          <span className="flex-shrink-0 font-normal text-gray-500">
+            <span className="px-1 text-xs text-gray-500">·</span>
             {format(parseISO(tweet.date), "MMM d")}
           </span>
         </p>
+
         <p className="text-sm">{tweet.text}</p>
 
         <div className="flex justify-between mt-3 text-gray-500">
@@ -117,7 +124,7 @@ function Tweet({ tweet }) {
 
 function useBufferedData(url) {
   let { data, error } = useSWR(url, fetcher);
-  let [buffer, setBuffer] = useState();
+  let [buffer, setBuffer] = useState(data);
 
   if (data && !buffer) setBuffer(data);
 
