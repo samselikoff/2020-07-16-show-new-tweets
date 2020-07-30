@@ -1,10 +1,25 @@
 import useSWR from "swr";
 import { format, parseISO } from "date-fns";
+import { useState } from "react";
 
 const fetcher = (url) => fetch(url).then((res) => res.json());
 
+function useBufferedData(url) {
+  let { error, data } = useSWR(url, fetcher);
+  let [buffer, setBuffer] = useState(data);
+
+  if (data && !buffer) setBuffer(data);
+
+  return {
+    data: buffer,
+    error,
+    stale: buffer !== data,
+    update: () => setBuffer(data),
+  };
+}
+
 function Home() {
-  let { error, data } = useSWR("/api/tweets", fetcher);
+  let { data, error, stale, update } = useBufferedData("/api/tweets");
 
   if (error) return "An error has occurred.";
   if (!data)
@@ -16,6 +31,27 @@ function Home() {
 
   return (
     <div>
+      {stale && (
+        <div className="absolute inset-x-0 flex justify-center top-20">
+          <button
+            onClick={update}
+            className="flex items-center px-4 py-1 text-white bg-blue-500 rounded-full shadow-lg focus:outline-none focus:shadow-outline"
+          >
+            <svg
+              className="w-4 h-4 mr-2"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z"
+                clipRule="evenodd"
+              ></path>
+            </svg>
+            See new Tweets
+          </button>
+        </div>
+      )}
       <div className="divide-y divide-gray-200">
         {[...data?.tweets].reverse().map((tweet) => (
           <div className="px-4 py-2" key={tweet.id}>
